@@ -85,6 +85,136 @@ class UsersPageTest {
     }
 
     @Test
+    fun loginWithTab(){
+        val usersPage =  UsersPage(driver)
+        val createUserForm = CreateUserForm(driver)
+        val loginPage = LoginPage(driver)
+        val login = "te\tt"
+        val ans ="tet"
+
+        loginPage.login("root", "12345")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/dashboard"))
+        goToUsers()
+        usersPage.deleteUser(ans)
+        goToUsers()
+        usersPage.goToCreateUserForm()
+        createUserForm.create(login, "pass", "pass")
+        assertTrue(createUserForm.isError())
+    }
+
+    @Test
+    fun loginWithNewLine(){
+        val usersPage =  UsersPage(driver)
+        val createUserForm = CreateUserForm(driver)
+        val loginPage = LoginPage(driver)
+        val login = "te\nt"
+        val ans ="tet"
+
+        loginPage.login("root", "12345")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/dashboard"))
+        goToUsers()
+        usersPage.deleteUser(ans)
+        goToUsers()
+        usersPage.goToCreateUserForm()
+        createUserForm.create(login, "pass", "pass")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/editUser/$ans"))
+        goToUsers()
+        assertTrue(usersPage.getUsers().contains(ans))
+    }
+
+    @Test
+    fun loginRussianLanguage(){
+        val usersPage =  UsersPage(driver)
+        val createUserForm = CreateUserForm(driver)
+        val loginPage = LoginPage(driver)
+        val login = "тест"
+
+        loginPage.login("root", "12345")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/dashboard"))
+        goToUsers()
+        usersPage.deleteUser(login)
+        goToUsers()
+        usersPage.goToCreateUserForm()
+        createUserForm.create(login, "pass", "pass")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/editUser/$login"))
+        goToUsers()
+        assertTrue(usersPage.getUsers().contains(login))
+    }
+
+    @Test
+    fun loginLong(){
+        val usersPage =  UsersPage(driver)
+        val createUserForm = CreateUserForm(driver)
+        val loginPage = LoginPage(driver)
+        val login = "a".repeat(100)
+
+        loginPage.login("root", "12345")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/dashboard"))
+        goToUsers()
+        usersPage.deleteUser("testUser")
+        goToUsers()
+        usersPage.goToCreateUserForm()
+        val ans = "a".repeat(50)
+        createUserForm.create(login, "pass", "pass")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/editUser/testUser"))
+        goToUsers()
+        print(usersPage.getUsers())
+        assertTrue(usersPage.getUsers().contains(ans))
+    }
+
+    @Test
+    fun loginDifferentEncoding(){
+        val usersPage =  UsersPage(driver)
+        val createUserForm = CreateUserForm(driver)
+        val loginPage = LoginPage(driver)
+        val login = "tetest".toByteArray().toString(Charsets.ISO_8859_1)
+
+        loginPage.login("root", "12345")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/dashboard"))
+        goToUsers()
+        usersPage.deleteUser(login)
+        goToUsers()
+        usersPage.goToCreateUserForm()
+        createUserForm.create(login, "pass", "pass")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/editUser/$login"))
+        goToUsers()
+        print(usersPage.getUsers())
+        assertTrue(usersPage.getUsers().contains(login))
+    }
+
+    @Test
+    fun loginSpecialSymbols(){
+        val usersPage =  UsersPage(driver)
+        val createUserForm = CreateUserForm(driver)
+        val loginPage = LoginPage(driver)
+        val login = "``\'\"\\"
+        val ans = "%60%60'%22%5C"
+
+        loginPage.login("root", "12345")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/dashboard"))
+        goToUsers()
+        usersPage.deleteUser(login)
+        goToUsers()
+        usersPage.goToCreateUserForm()
+        createUserForm.create(login, "pass", "pass")
+        WebDriverWait(driver, 5).ignoring(StaleElementReferenceException::class.java).
+            until(ExpectedConditions.urlToBe("http://localhost:8080/editUser/$ans"))
+        goToUsers()
+        print(usersPage.getUsers())
+        assertTrue(usersPage.getUsers().contains(login))
+    }
+
+    @Test
     fun loginSameUser(){
         val usersPage =  UsersPage(driver)
         val createUserForm = CreateUserForm(driver)
